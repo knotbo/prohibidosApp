@@ -10,12 +10,14 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
+import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -188,13 +190,12 @@ public class anticipoActivity extends AppCompatActivity implements View.OnClickL
 
 
     private void checkForm(){
-        if (editNombreSolicitante.getText().length() > 3
+        if (editNombreSolicitante.getText().length() > 0
             && editApellidosSolicitante.getText().length() > 3
             && editDniSolicitante.getText().length() > 3
-            && editNombreSolicitante.getText().length() > 3
+            && editNombreEncargado.getText().length() > 0
             && editApellidosEncargado.getText().length() > 3
             && editDniEncargado.getText().length() > 3
-            && editNombreEncargado.getText().length() > 3
             && importe >= 100
             && importe <= 300
             && !editDniSolicitante.getText().toString().equals(editDniEncargado.getText().toString())
@@ -425,6 +426,14 @@ public class anticipoActivity extends AppCompatActivity implements View.OnClickL
                                 datosEncargado.setVisibility(View.VISIBLE);
 
                                 datosImporte.setVisibility(View.VISIBLE);
+
+                                // Llevo el scroll al final de la actividad
+                                ScrollView scrollView = findViewById(R.id.scrollAnticipos);
+                                scrollView.fullScroll(ScrollView.FOCUS_DOWN);
+
+                                // Oculta el teclado virtual
+                                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                                imm.hideSoftInputFromWindow(scrollView.getWindowToken(), 0);
 
                                 //Nuevo SnackBar 28/12/2022
                                 Snackbar mySnackbar = Snackbar.make(findViewById(R.id.anticipoLayout), "Encargado: " + editNombreEncargado.getText().toString() + ' ' + editApellidosEncargado.getText().toString(), Snackbar.LENGTH_LONG);

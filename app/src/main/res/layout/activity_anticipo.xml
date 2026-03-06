@@ -12,6 +12,7 @@
 
 
     <ScrollView
+        android:id="@+id/scrollAnticipos"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent">
 
@@ -44,6 +45,17 @@
                 android:layout_marginTop="10dp"
                 android:orientation="vertical"
                 android:padding="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Los Anticipos Salariales se podrán solicitar sólo en dos plazos cada mes: \n     • Del día 11 al 15.\n     • Del dia 21 al 25."
+                    android:padding="10dp"
+                    android:paddingBottom="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:textSize="18sp"
+                    android:background="@color/colorPrimaryDark"
+                    />
 
                 <TextView
                     android:id="@+id/txt_dniSolicitante"

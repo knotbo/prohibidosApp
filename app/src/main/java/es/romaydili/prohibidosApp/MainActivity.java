@@ -132,7 +132,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static String numProhibidosUltActualizacion;
     private static String mensaje = "";
     private static String versionApp = "";
-    private static boolean esSalon = false;
+    private static boolean esSalon = true;
     private static String provincia = "";
     private static boolean scanner_inicial;
     private static boolean ocultarInfo;
@@ -354,6 +354,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ocultarInfo = myPreferences.getBoolean("ocultar_info", true);
         beep = myPreferences.getBoolean("beep", true);
         imprimir_vales = myPreferences.getBoolean("imprimir_vales", false);
+
+
 /*
         // Here, thisActivity is the current activity
         if (ContextCompat.checkSelfPermission(MainActivity.this,
@@ -920,6 +922,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                             // En los datos que recibo verifico si obtengo el estado o 'status' con el valor 'true'
                             // El dato 'status' con el valor 'true' se encuentra dentro del archivo JSON
+
+                            //Log.i("Json Recibido", jsonObject.toString());
                             if (jsonObject.getString("status").equals("true")) {
                                 activado = jsonObject.getBoolean("activado");
                                 if ( activado == true){
@@ -1005,7 +1009,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                             Toast.makeText(getApplicationContext(), fechaUltActualizacion, Toast.LENGTH_LONG).show();
 
-                            if ( MainActivity.getDebugMode() == false && !mensaje.equals("") ) {
+                            if ( MainActivity.getDebugMode() == false && !mensaje.equals("null") ) {
                                 Snackbar mySnackbar = Snackbar.make(findViewById(R.id.mainLayout), mensaje, Snackbar.LENGTH_LONG);
                                 //mySnackbar.setAction(R.string.undo_string, new MyUndoListener());
                                 View snackbarView = mySnackbar.getView();
@@ -1036,6 +1040,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     public void onClick(DialogInterface dialog, int which) {
                                         //Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url_actualizacion));
                                         //startActivity(browserIntent);
+
                                         UpdateApp actualizaApp = new UpdateApp();
                                         actualizaApp.setContext(getApplicationContext());
                                         actualizaApp.setActivity(MainActivity.this);
@@ -1327,6 +1332,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         @Override
         protected Boolean doInBackground(String... arg0) {
+            String PATH = "/sdcard/Download/";
             try {
                 if (Build.VERSION.SDK_INT >= 23) {
                     String[] PERMISSIONS = {android.Manifest.permission.WRITE_EXTERNAL_STORAGE};
@@ -1354,7 +1360,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
 
                 //String RutaInterna = getExternalFilesDirs(Environment.DIRECTORY_DOWNLOADS).toString();
-                String PATH = "/sdcard/Download/";
+
                 //String PATH = context.getFilesDir() + "/";
                 File file = new File(PATH);
                 file.mkdirs();
@@ -1394,15 +1400,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 });
 
 
-                intent = new Intent(Intent.ACTION_VIEW);
-                file = new File(PATH + "update_prohibidos.apk");
-                Uri data = FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".provider", file);
-                intent.setDataAndType(data, "application/vnd.android.package-archive");
-                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | FLAG_ACTIVITY_NEW_TASK);
-                context.startActivity(intent);
 
-                Log.i("UpdateAPP", "Actualización Completada! ");
-                progressBar.dismiss();
 
             } catch (final Exception e) {
                 Log.e("UpdateAPP", "Update error! " + e.getMessage());
@@ -1410,6 +1408,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 handler.post(new Runnable() {
                     public void run() {
                         Toast.makeText(context, "Error al Descargar la Actualización:\n" + e.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
+
+            try{
+                intent = new Intent(Intent.ACTION_VIEW);
+
+                File file = new File(PATH + "update_prohibidos.apk");
+                Uri data = FileProvider.getUriForFile(context, context.getPackageName() + ".provider", file);
+                intent.setDataAndType(data, "application/vnd.android.package-archive");
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | FLAG_ACTIVITY_NEW_TASK);
+                context.startActivity(intent);
+
+                Log.i("UpdateAPP", "Actualización Completada! ");
+                progressBar.dismiss();
+            } catch (final Exception e) {
+                Log.e("UpdateAPP", "Update error! " + e.getMessage());
+                Handler handler = new Handler(context.getMainLooper());
+                handler.post(new Runnable() {
+                    public void run() {
+                        Toast.makeText(context, "Error al Actualizar:\n" + e.getMessage(), Toast.LENGTH_LONG).show();
                     }
                 });
             }
