@@ -1,6 +1,11 @@
 /*
 Changelog
 -----------------------------------------------------
+Versión 0.6.0.0 (16/03/2026)
+------------------------
++ Primera versión con Barkoder
++ Lectura del DNI con el QR de la policia en la app miDNI
+
 Versión 0.5.0.2 (19/08/2024)
 ------------------------
 + Corregido, por defecto el dispositivo es un salón, para que muestre siempre los botones de comprobación
@@ -139,10 +144,14 @@ Versión 0.1 (03/07/2020)
 apply plugin: 'com.android.application'
 
 repositories {
+    google()
+    mavenCentral()
+    maven { url 'https://jitpack.io' }
     flatDir {
         dirs 'libs'
     }
 }
+
 
 android {
     compileSdk 31
@@ -151,7 +160,7 @@ android {
         minSdkVersion 23
         targetSdkVersion 31
         versionCode 5
-        versionName "0.5.0.2" //Versión que incluye las Solicitudes de Anticipo
+        versionName "0.6.0.0" //Versión que incluye las Solicitudes de Anticipo
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -192,6 +201,7 @@ dependencies {
     implementation 'com.google.android.material:material:1.1.0'
 
     implementation(name: 'mrzscannerlib', ext: 'aar')
+    implementation project(path: ':barkoder')
     //implementation 'com.android.support:appcompat-v7:28.0.0'
     implementation 'androidx.appcompat:appcompat:1.1.0'
 
@@ -200,4 +210,7 @@ dependencies {
     implementation 'androidx.preference:preference:1.1.1'
     implementation 'androidx.security:security-crypto:1.1.0-alpha01'
     compileOnly 'com.google.android.wearable:wearable:2.8.1'
+
+    //Para las imagenes JP2 del QR de midni
+    implementation(name: 'jp2-android-1.0.3', ext: 'aar')
 }

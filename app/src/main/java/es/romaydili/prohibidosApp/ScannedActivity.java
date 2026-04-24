@@ -1,5 +1,7 @@
 package es.romaydili.prohibidosApp;
 
+import static android.content.ContentValues.TAG;
+
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 
@@ -25,6 +27,7 @@ import android.text.InputType;
 import android.text.Spanned;
 import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -79,7 +82,7 @@ public class ScannedActivity extends AppCompatActivity implements View.OnClickLi
 
     Button scanBtn,backBtn,submitBtn,manualBtn;
 
-    EditText editGivenName, surName, editDocNum, editIssuingCount, editNationallity, editDateOfBirth, editSex, editExporationDate, editOptionalVal,editIssuingDate,editRawMrz,editSDK;
+    EditText editGivenName, surName, editDocNum, editIssuingCount, editNationallity, editDateOfBirth, editAge, editSex, editExporationDate, editOptionalVal,editIssuingDate,editRawMrz,editSDK;
     TextView datosCliente;
 
 
@@ -100,6 +103,7 @@ public class ScannedActivity extends AppCompatActivity implements View.OnClickLi
         editIssuingCount = findViewById(R.id.edit_issuing_country);
         editNationallity = findViewById(R.id.edit_nationality);
         editDateOfBirth = findViewById(R.id.edit_date_of_birth);
+        editAge = findViewById(R.id.edit_age);
         editSex = findViewById(R.id.edit_sex);
         editExporationDate = findViewById(R.id.edit_expiration_date);
         editOptionalVal = findViewById(R.id.edit_optional_values);
@@ -123,6 +127,8 @@ public class ScannedActivity extends AppCompatActivity implements View.OnClickLi
 
     private void addResultToEditText(JSONObject successfulMrzScan) throws JSONException {
 
+        int edad = calcularEdad(successfulMrzScan.getString("dob_readable"));
+
         editGivenName.setText(successfulMrzScan.getString("given_names_readable"));
         surName.setText(successfulMrzScan.getString("surname"));
         editDocNum.setText(successfulMrzScan.getString("document_number"));
@@ -130,6 +136,7 @@ public class ScannedActivity extends AppCompatActivity implements View.OnClickLi
         editIssuingDate.setText(successfulMrzScan.getString("est_issuing_date_readable"));
         editNationallity.setText(successfulMrzScan.getString("nationality"));
         editDateOfBirth.setText(successfulMrzScan.getString("dob_readable"));
+        editAge.setText(String.valueOf(edad));
         editSex.setText(successfulMrzScan.getString("sex"));
         editExporationDate.setText(successfulMrzScan.getString("expiration_date_readable"));
         editOptionalVal.setText(successfulMrzScan.getString("optionals"));
@@ -218,7 +225,7 @@ public class ScannedActivity extends AppCompatActivity implements View.OnClickLi
                 addResultToEditText(jsonObj);
             }
         } catch (Exception ex) {
-            Toast.makeText(this, "Fallo en el resulatado de la actividad\r\n" + MRZScanner.sdkVersion(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Fallo en el resultado de la actividad\r\n" + MRZScanner.sdkVersion(), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -624,10 +631,57 @@ public class ScannedActivity extends AppCompatActivity implements View.OnClickLi
                 params.put( "tipo_documento", tipo_documento);
                 params.put( "fecha_expedicion", editIssuingDate.getText().toString());
 
+                Log.d(TAG, "Enviando al Servidor:\n" + MainActivity.getUrlMrz() + "\n" + params.toString());
+
                 return params;
             }
         };
         Volley.newRequestQueue(this).add(postRequest);
+    }
+
+    private int calcularEdad(String fechaNacimiento) {
+        if (fechaNacimiento == null) return -1;
+
+        // Quitamos guiones, barras, puntos o espacios: "2026-04-10" -> "20260410"
+        String limpia = fechaNacimiento.replaceAll("[^0-9]", "");
+        if (limpia.length() < 8) return -1;
+
+        try {
+            int anio, mes, dia;
+
+            // DETECCIÓN AUTOMÁTICA DE FORMATO
+            // Si el año está al principio (Formato ISO: YYYYMMDD)
+            if (Integer.parseInt(limpia.substring(0, 4)) > 1900) {
+                anio = Integer.parseInt(limpia.substring(0, 4));
+                mes = Integer.parseInt(limpia.substring(4, 6));
+                dia = Integer.parseInt(limpia.substring(6, 8));
+            }
+            // Si el año está al final (Formato Europeo: DDMMYYYY)
+            else {
+                dia = Integer.parseInt(limpia.substring(0, 2));
+                mes = Integer.parseInt(limpia.substring(2, 4));
+                anio = Integer.parseInt(limpia.substring(4, 8));
+            }
+
+            java.util.Calendar nac = java.util.Calendar.getInstance();
+            nac.set(anio, mes - 1, dia);
+
+            java.util.Calendar hoy = java.util.Calendar.getInstance();
+
+            int edad = hoy.get(java.util.Calendar.YEAR) - nac.get(java.util.Calendar.YEAR);
+
+            // Ajuste de precisión (si aún no ha llegado su cumple este año)
+            if (hoy.get(java.util.Calendar.MONTH) < nac.get(java.util.Calendar.MONTH) ||
+                    (hoy.get(java.util.Calendar.MONTH) == nac.get(java.util.Calendar.MONTH) &&
+                            hoy.get(java.util.Calendar.DAY_OF_MONTH) < nac.get(java.util.Calendar.DAY_OF_MONTH))) {
+                edad--;
+            }
+
+            return edad;
+        } catch (Exception e) {
+            Log.e("EDAD", "Error al calcular con fecha: " + fechaNacimiento);
+            return -1;
+        }
     }
 
 }

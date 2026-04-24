@@ -119,7 +119,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static final int myRequestCode = 0xe110; // Or whatever number you want
     // ensure it's unique compared to other activity request codes you use
 
-    Button button_solicitudEfectivo,button_anticipo,button_scanner, button_comprobar, button_configuracion;
+    Button button_solicitudEfectivo,button_anticipo,button_scanner, button_scanner_nuevo, button_comprobar, button_configuracion;
     TextView textVersion, textProvincia, textUltimaActualizacion;
     ImageView logoGEHD;
     ProgressBar spinner;
@@ -144,6 +144,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private String url_servidor = "ce-juegos.es/";
     private static String url_documento;
     private static String url_mrz;
+    private static String url_mrz_barkoder;
     private static String url_efectivo;
 
     private static String url_datosDni;
@@ -210,6 +211,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public static String getUrlMrz() {
         return url_mrz;
+    }
+    public static String getUrl_mrz_barkoder() {
+        return url_mrz_barkoder;
     }
 
     public static String getUrlEfectivo() {
@@ -331,6 +335,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         button_solicitudEfectivo = findViewById(R.id.btn_solicitud);
         button_anticipo = findViewById(R.id.btn_anticipo);
         button_scanner = findViewById(R.id.btn_scanner);
+        button_scanner_nuevo = findViewById(R.id.btn_scanner_nuevo);
         button_comprobar = findViewById(R.id.btn_comprobar);
         button_configuracion = findViewById(R.id.btn_configuracion);
         textVersion = findViewById(R.id.textView_Version);
@@ -342,6 +347,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         button_solicitudEfectivo.setOnClickListener(this);
         button_anticipo.setOnClickListener(this);
         button_scanner.setOnClickListener(this);
+        button_scanner_nuevo.setOnClickListener(this);
         button_comprobar.setOnClickListener(this);
         button_configuracion.setOnClickListener(this);
         textUltimaActualizacion.setOnClickListener(this);
@@ -436,7 +442,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         if (ultActualizacion.equals("")) {
             ultima_actualizacion();
-
         }
 
 
@@ -475,6 +480,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             spinner.setVisibility(View.INVISIBLE);
             startActivity(new Intent(getApplicationContext(), ScannedActivity.class));
         }
+
+        if (view == button_scanner_nuevo) {
+            spinner.setVisibility(View.INVISIBLE);
+            startActivity(new Intent(getApplicationContext(), ScannedBarkoderActivity.class));
+        }
+
         if (view == button_configuracion) {
             spinner.setVisibility(View.INVISIBLE);
             startActivityForResult(new Intent(new Intent(getApplicationContext(), ConfiguracionActivity.class)), myRequestCode );
@@ -931,6 +942,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                                     url_documento = jsonObject.getString("url_documento");
                                     url_mrz = jsonObject.getString("url_mrz");
+                                    url_mrz_barkoder = jsonObject.getString("url_mrz_barkoder");
+
 
                                     fechaUltActualizacion = jsonObject.getString("ultActualizacion");
                                     provincia = jsonObject.getString("provincia");
@@ -999,12 +1012,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                             button_comprobar.setVisibility(View.VISIBLE);
                             button_scanner.setVisibility(View.VISIBLE);
+                            button_scanner_nuevo.setVisibility(View.VISIBLE);
 
                             if (esSalon == false){
                                 button_solicitudEfectivo.setVisibility(View.GONE);
                                 button_comprobar.setVisibility(View.GONE);
                                 button_scanner.setVisibility(View.GONE);
-
+                                button_scanner_nuevo.setVisibility(View.GONE);
                             }
 
                             Toast.makeText(getApplicationContext(), fechaUltActualizacion, Toast.LENGTH_LONG).show();
@@ -1069,6 +1083,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             button_solicitudEfectivo.setVisibility(View.GONE);
                             button_comprobar.setVisibility(View.INVISIBLE);
                             button_scanner.setVisibility(View.INVISIBLE);
+                            button_scanner_nuevo.setVisibility(View.INVISIBLE);
                             //textUltimaActualizacion.setGravity(Gravity.CENTER);
                             textUltimaActualizacion.setText("Dispositivo NO Activado");
                             logoGEHD.setVisibility(View.INVISIBLE);
@@ -1134,7 +1149,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    private void procesa_JSON(String cadena) {
+    private void procesa_JSON(String cadena) { //NO USADO
         // Creo un array con los datos JSON que he obtenido
         ArrayList listaArray = new ArrayList<>();
 
