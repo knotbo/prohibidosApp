@@ -78,6 +78,8 @@ public class ScannedBarkoderActivity extends AppCompatActivity implements View.O
     private String imagenMRZBase64 = "";
     private String imagenTipo = "";
 
+    //private String versionSDK = "";
+
     Button scanBtn,backBtn,submitBtn,manualBtn;
 
     EditText editGivenName, surName, editDocNum, editIssuingCount, editNationallity, editDateOfBirth, editAge, editSex, editExporationDate, editOptionalVal,editIssuingDate, editTipoDocumento, editRawMrz,editSDK;
@@ -140,6 +142,7 @@ public class ScannedBarkoderActivity extends AppCompatActivity implements View.O
         editOptionalVal.setText("");
         editTipoDocumento.setText("");
         editRawMrz.setText("");
+        editSDK.setText("");
 
         // Foto
         imgMrz.setImageBitmap(null);
@@ -162,6 +165,7 @@ public class ScannedBarkoderActivity extends AppCompatActivity implements View.O
         editOptionalVal.setText(datos.optString("valores_opcionales"));
         editTipoDocumento.setText(datos.optString("tipo"));
         editRawMrz.setText(datos.optString("raw"));
+        //editSDK.setText(versionSDK);
 
         // Foto
         imagenMRZBase64 = datos.getString("foto");
@@ -170,8 +174,8 @@ public class ScannedBarkoderActivity extends AppCompatActivity implements View.O
 
         if(MainActivity.getDebugMode() == true){
 
-//            findViewById(R.id.label_sdk).setVisibility(View.VISIBLE);
-//            editSDK.setVisibility(View.VISIBLE);
+            //findViewById(R.id.label_sdk).setVisibility(View.VISIBLE);
+            //editSDK.setVisibility(View.VISIBLE);
 
             findViewById(R.id.txt_date_of_birth).setVisibility(View.VISIBLE);
             editDateOfBirth.setVisibility(View.VISIBLE);
@@ -252,17 +256,29 @@ public class ScannedBarkoderActivity extends AppCompatActivity implements View.O
             editOptionalVal.setVisibility(View.VISIBLE);
         }
 
-        if (datos.has("QR_valido") && !datos.optBoolean("QR_valido")) {
+        if (!MainActivity.getQRHabilitado() && datos.getString("tipo").equals("QR MiDNI")) {
             submitBtn.setEnabled(false);
-            String textoError = "Fecha de caducidad del QR no válida:\n" + datos.optString("timestampQR");
-            Toast.makeText(this, textoError, Toast.LENGTH_LONG).show();
-            Snackbar snack = Snackbar.make(findViewById(R.id.scannedLayout), textoError, 10000); // 10 segundos
+
+            String textoMsg = "Lectura de QR no habilitado, consulte con su proveedor.";
+            Toast.makeText(this, textoMsg, Toast.LENGTH_LONG).show();
+            Snackbar snack = Snackbar.make(findViewById(R.id.scannedLayout), textoMsg, 10000); // 10 segundos
             snack.setAction("OK", v -> {});
             snack.setTextColor(Color.WHITE);
             snack.show();
-        }else{
-            submitBtn.setEnabled(true);
-            Submit();
+        }else {
+            if (datos.has("QR_valido") && !datos.optBoolean("QR_valido")) {
+                submitBtn.setEnabled(false);
+                String textoError = "Fecha de caducidad del QR no válida:\n" + datos.optString("timestampQR");
+                Toast.makeText(this, textoError, Toast.LENGTH_LONG).show();
+                Snackbar snack = Snackbar.make(findViewById(R.id.scannedLayout), textoError, 10000); // 10 segundos
+                snack.setAction("OK", v -> {
+                });
+                snack.setTextColor(Color.WHITE);
+                snack.show();
+            } else {
+                submitBtn.setEnabled(true);
+                Submit();
+            }
         }
     }
 
@@ -334,6 +350,11 @@ public class ScannedBarkoderActivity extends AppCompatActivity implements View.O
             try {
                 JSONObject jsonObj = new JSONObject(data.getStringExtra("key"));
                 String tipo = jsonObj.optString("type", "");
+                /*
+                if (versionSDK.equals("")){
+                    versionSDK = jsonObj.optString("versionSDK", "");
+                }
+                */
 
                 if (tipo.equals("QR")) {
                     procesarLecturaQR();
@@ -537,8 +558,8 @@ public class ScannedBarkoderActivity extends AppCompatActivity implements View.O
                 findViewById(R.id.label_mrz).setVisibility(View.VISIBLE);
                 editRawMrz.setVisibility(View.VISIBLE);
 
-//                findViewById(R.id.label_sdk).setVisibility(View.VISIBLE);
-//                editSDK.setVisibility(View.VISIBLE);
+                //findViewById(R.id.label_sdk).setVisibility(View.VISIBLE);
+                //editSDK.setVisibility(View.VISIBLE);
 
                 findViewById(R.id.txt_given_name).setVisibility(View.VISIBLE);
                 editGivenName.setVisibility(View.VISIBLE);

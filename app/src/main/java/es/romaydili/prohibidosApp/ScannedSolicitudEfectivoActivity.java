@@ -363,7 +363,7 @@ public class ScannedSolicitudEfectivoActivity extends AppCompatActivity implemen
                             // El dato 'status' con el valor 'true' se encuentra dentro del archivo JSON
                             if (jsonObject.getString("status").equals("true")) {
                                 JSONArray arrayResultado=jsonObject.getJSONArray("resultado");
-                                ArrayList lista_ultimasSolicitudes=new ArrayList<String>();
+                                ArrayList<String> lista_ultimasSolicitudes=new ArrayList<String>();
 
                                 lista_ultimasSolicitudes.add("Últimas Solicitudes " + "(" + arrayResultado.length() + ")");
 

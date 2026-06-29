@@ -30,6 +30,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 //import com.romaydili.prohibidosApp.MainActivity;
+import com.barkoder.Barkoder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.scansolutions.mrzscannerlib.MRZScanner;
@@ -53,7 +54,7 @@ public class ConfiguracionActivity extends AppCompatActivity implements View.OnC
     List<Date> selectedDate;
     EditText adavancePay;
     TextView totalAmount;
-    TextView androidID, configuracion,provincia,ultActualizacion,ficheroUltActualizacion,numProhibidosUltActualizacion,usuario_txt, label_sdk, text_sdk;
+    TextView androidID, configuracion,provincia,ultActualizacion,ficheroUltActualizacion,usuario_txt, label_sdk, text_sdk, text_QR;
     EditText usuario_edit;
     CheckBox scannerInicial,debugMode,imprimirVales,ocultarInfo,beep;
     Boolean editando_usuario=false;
@@ -84,7 +85,7 @@ public class ConfiguracionActivity extends AppCompatActivity implements View.OnC
         provincia=findViewById(R.id.provincia);
         ultActualizacion=findViewById(R.id.ultimaActualizacion);
         ficheroUltActualizacion=findViewById(R.id.fichero_actualizacion);
-        numProhibidosUltActualizacion=findViewById(R.id.numProhibidos);
+        //numProhibidosUltActualizacion=findViewById(R.id.numProhibidos);
         scannerInicial=findViewById(R.id.scannerInical_ckBox);
         beep=findViewById(R.id.beep_ckBox);
         imprimirVales=findViewById(R.id.impresion_ckBox);
@@ -94,6 +95,7 @@ public class ConfiguracionActivity extends AppCompatActivity implements View.OnC
         usuario_txt=findViewById(R.id.usuario_txt);
         label_sdk=findViewById(R.id.label_sdk);
         text_sdk=findViewById(R.id.text_sdk);
+        text_QR=findViewById(R.id.qr_estado);
 
         configuracion.setOnClickListener(this);
 
@@ -127,10 +129,16 @@ public class ConfiguracionActivity extends AppCompatActivity implements View.OnC
 
         if(MainActivity.getActivado()) {
             ultActualizacion.setText(MainActivity.getFechaUltActualizacion());
-            provincia.setText(MainActivity.getProvincia());
+            provincia.setText(MainActivity.getProvincia() + " (" + MainActivity.getNumProhibidosUltActualizacion() + ")");
             ficheroUltActualizacion.setText(MainActivity.getFicheroUltActualizacion());
-            numProhibidosUltActualizacion.setText(MainActivity.getNumProhibidosUltActualizacion());
-            text_sdk.setText(MRZScanner.sdkVersion());
+            //numProhibidosUltActualizacion.setText(MainActivity.getNumProhibidosUltActualizacion());
+            //text_sdk.setText(MRZScanner.sdkVersion());
+            text_sdk.setText(Barkoder.GetVersion());
+            if (MainActivity.getQRHabilitado()) {
+                text_QR.setText("Habilitado");
+            }else{
+                text_QR.setText("Deshabilitado");
+            }
         }
 
 

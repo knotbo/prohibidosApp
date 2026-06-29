@@ -119,7 +119,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static final int myRequestCode = 0xe110; // Or whatever number you want
     // ensure it's unique compared to other activity request codes you use
 
-    Button button_solicitudEfectivo,button_anticipo,button_scanner, button_scanner_nuevo, button_comprobar, button_configuracion;
+    Button button_solicitudEfectivo, button_anticipo, button_scanner, button_scanner_nuevo, button_comprobar, button_configuracion;
     TextView textVersion, textProvincia, textUltimaActualizacion;
     ImageView logoGEHD;
     ProgressBar spinner;
@@ -151,6 +151,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static String url_jugador;
     private Boolean actualizacion_disponible = false;
     private Boolean actualizacion_permitir = false;
+    private static Boolean QR_habilitado = false;
     private String url_actualizacion, mensaje_actualizacion;
 
     public static String getIdentificadorAndroid() {
@@ -212,6 +213,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public static String getUrlMrz() {
         return url_mrz;
     }
+
     public static String getUrl_mrz_barkoder() {
         return url_mrz_barkoder;
     }
@@ -256,7 +258,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return ipServidor;
     }
 
-    public static void guardarJugador(final Context contexto, final String documento,final String nivelJuego) {
+    public static Boolean getQRHabilitado() {
+        return QR_habilitado;
+    }
+
+    public static void guardarJugador(final Context contexto, final String documento, final String nivelJuego) {
         //URL of the request we are sending
 
         StringRequest postRequest = new StringRequest(Request.Method.POST, MainActivity.getUrlJugador(),
@@ -294,7 +300,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         if (MainActivity.getDebugMode() == true) {
                             Toast.makeText(contexto, response, Toast.LENGTH_LONG).show();
 
-                        }else{
+                        } else {
                             Toast.makeText(contexto, mensaje, Toast.LENGTH_LONG).show();
                         }
                     }
@@ -323,7 +329,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 return params;
             }
         };
-        Volley.newRequestQueue( contexto ).add(postRequest);
+        Volley.newRequestQueue(contexto).add(postRequest);
     }
 
 
@@ -334,7 +340,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         button_solicitudEfectivo = findViewById(R.id.btn_solicitud);
         button_anticipo = findViewById(R.id.btn_anticipo);
-        button_scanner = findViewById(R.id.btn_scanner);
+        //button_scanner = findViewById(R.id.btn_scanner); //MRZScanner Desactivado el 27/06/2026
         button_scanner_nuevo = findViewById(R.id.btn_scanner_nuevo);
         button_comprobar = findViewById(R.id.btn_comprobar);
         button_configuracion = findViewById(R.id.btn_configuracion);
@@ -346,7 +352,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         button_solicitudEfectivo.setOnClickListener(this);
         button_anticipo.setOnClickListener(this);
-        button_scanner.setOnClickListener(this);
+        //button_scanner.setOnClickListener(this);
         button_scanner_nuevo.setOnClickListener(this);
         button_comprobar.setOnClickListener(this);
         button_configuracion.setOnClickListener(this);
@@ -422,7 +428,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             androidID_codificado = msharedPreferences.getString("androidID", "unknown");
             usuario = msharedPreferences.getString("usuario", "unknown");
 
-            if (usuario.contains("fernando_")){
+            if (usuario.contains("fernando_")) {
                 ipServidor = "192.168.1.23";
                 Toast.makeText(getApplicationContext(), "Servidor de impresión (NANDO-PC): " + ipServidor, Toast.LENGTH_SHORT).show();
 
@@ -443,12 +449,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (ultActualizacion.equals("")) {
             ultima_actualizacion();
         }
-
-
-        borrarUpdate borraUpdate = new borrarUpdate();
-        borraUpdate.setContext(getApplicationContext());
-        borraUpdate.setActivity(MainActivity.this);
-        borraUpdate.execute();
 
         //FadeOut del Spinner
         AlphaAnimation fadeOutAnimation = new AlphaAnimation(1.0f, 0.0f);//fade from 1 to 0 alpha
@@ -476,10 +476,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             solicitar_dni(this, findViewById(R.id.mainLayout));
         }
 
+        /*
         if (view == button_scanner) {
             spinner.setVisibility(View.INVISIBLE);
             startActivity(new Intent(getApplicationContext(), ScannedActivity.class));
         }
+        */
 
         if (view == button_scanner_nuevo) {
             spinner.setVisibility(View.INVISIBLE);
@@ -488,7 +490,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         if (view == button_configuracion) {
             spinner.setVisibility(View.INVISIBLE);
-            startActivityForResult(new Intent(new Intent(getApplicationContext(), ConfiguracionActivity.class)), myRequestCode );
+            startActivityForResult(new Intent(new Intent(getApplicationContext(), ConfiguracionActivity.class)), myRequestCode);
         }
 
         if (view == textUltimaActualizacion) {
@@ -504,8 +506,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data)
-    {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == myRequestCode) {
@@ -520,7 +521,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 mySnackbar.show();
                 //Fin Nuevo SnackBar 28/12/2022
 
-                if (data.getData().toString().contains("Reiniciando la App")){
+                if (data.getData().toString().contains("Reiniciando la App")) {
                     startActivity(new Intent(this, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent
                             .FLAG_ACTIVITY_CLEAR_TOP));
                 }
@@ -545,7 +546,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     };
 
-    public static void solicitar_dni( final Context contexto, final View view) {
+    public static void solicitar_dni(final Context contexto, final View view) {
         AlertDialog.Builder builder = new AlertDialog.Builder(contexto);
 
         builder.setIcon(android.R.drawable.ic_menu_search);
@@ -640,7 +641,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
     }
 
-    public static void tonoAviso(Context contexto, int tipoAviso){
+    public static void tonoAviso(Context contexto, int tipoAviso) {
         //vibrar
         Vibrator v = (Vibrator) contexto.getSystemService(VIBRATOR_SERVICE);
         //long [] patron = {0, 500, 300, 1000, 500, 300, 1000, 500, 300, 1000, 500, 300, 1000, 500, 300, 1000, 500, 300, 1000};
@@ -652,11 +653,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         final long[] patronLargo = {0, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 2000, 100, 2000, 100, 1000, 100, 1000, 100, 500, 100, 500, 100}; //Vibración larga
 
         if (tipoAviso == 1) {
-            v.vibrate(patronMedio,-1);
-        }else if (tipoAviso == 2){ //Vibración Larga
-            v.vibrate(patronLargo,-1);
-        }else{
-            v.vibrate(patronCorto,-1);
+            v.vibrate(patronMedio, -1);
+        } else if (tipoAviso == 2) { //Vibración Larga
+            v.vibrate(patronLargo, -1);
+        } else {
+            v.vibrate(patronCorto, -1);
         }
 
         //tono de aviso
@@ -666,10 +667,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //toneGen1.startTone(ToneGenerator.TONE_CDMA_ANSWER, 200); //Sonido error 2
         toneGen1.startTone(ToneGenerator.TONE_CDMA_CONFIRM, 600); //Sonido error 3
 
-        synchronized (toneGen1){
+        synchronized (toneGen1) {
             try {
                 toneGen1.wait(1000);
-            } catch (Exception ex) {}
+            } catch (Exception ex) {
+            }
             //toneGen1.startTone(ToneGenerator.TONE_PROP_ACK, 150); //Bip Leido de nuevo
             //toneGen1.startTone(ToneGenerator.TONE_CDMA_ABBR_INTERCEPT, 200); //Sonido error 1
             //toneGen1.startTone(ToneGenerator.TONE_CDMA_ANSWER, 200); //Sonido error 2
@@ -693,13 +695,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         String mensajeMiLista = "";
                         Boolean solicitarJugador = false; //Encuesta si el cliente es Jugador
                         //int numAccesosHoy = -1;
-                        boolean imprimirPromocion=false;
+                        boolean imprimirPromocion = false;
 
                         // Creo un array con los datos JSON que he obtenido
                         ArrayList listaArray = new ArrayList<>();
 
                         // Solicito los datos al archivo JSON
-                        String msgErrorExcepcion="";
+                        String msgErrorExcepcion = "";
                         try {
                             JSONObject jsonObject = new JSONObject(response);
 
@@ -713,7 +715,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 //certificadoCovid = jsonObject.getBoolean("certificadoCovid"); //Certificado Covid
                                 enMiLista = jsonObject.getBoolean("enMiLista"); //Está en la lista personal
                                 mensajeMiLista = jsonObject.getString("mensajeMiLista");
-                                if ( MainActivity.getVersion().equals("SerOnuba") ) {
+                                if (MainActivity.getVersion().equals("SerOnuba")) {
                                     solicitarJugador = jsonObject.getBoolean("solicitarJugador");
                                     imprimirPromocion = jsonObject.getBoolean("promocion");
                                 }
@@ -728,12 +730,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                             Toast.makeText(contexto, "Error procesando JSON", Toast.LENGTH_LONG).show();
 
-                            if(MainActivity.getDebugMode() == true) {
-                                msgErrorExcepcion=e.toString();
+                            if (MainActivity.getDebugMode() == true) {
+                                msgErrorExcepcion = e.toString();
                             }
                         }
 
-                        if(MainActivity.getDebugMode() == true) {
+                        if (MainActivity.getDebugMode() == true) {
                             //Nuevo SnackBar 28/12/2022
                             Snackbar mySnackbar;
                             if (msgErrorExcepcion.equals("")) {
@@ -760,12 +762,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             estilo = R.style.MyDialogThemePermitido;
                             titulo = "Accceso Permitido";
                             icono = R.drawable.ic_baseline_check_circle_24;
-                            if ( imprimir_vales == true && imprimirPromocion == true ) {
+                            if (imprimir_vales == true && imprimirPromocion == true) {
                                 imprimir(documento, contexto, view);
                                 titulo = "Accceso Permitido + PROMO";
                                 mensaje = mensaje + "<br><br>IMPRIMIENDO PROMO";
                             }
-                            if (enMiLista == true){
+                            if (enMiLista == true) {
                                 tonoAviso(contexto, 2); //Aviso Largo
                             }
                         } else {
@@ -847,7 +849,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
                         //Alert opciones Jugador 30/08/22
-                        if ( MainActivity.getVersion().equals("SerOnuba") && resultado_correcto == true && permitido == true && solicitarJugador == true) {
+                        if (MainActivity.getVersion().equals("SerOnuba") && resultado_correcto == true && permitido == true && solicitarJugador == true) {
                             final CharSequence[] OPCIONES_ALERTA = {"Jugador Fuerte", "Jugador Frecuente", "Jugador Ocasional", "No Juega", "No lo sé"};
 
                             androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(contexto, R.style.Theme_AppCompat_Dialog);
@@ -907,7 +909,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
         String url2 = "App";
-        String url_Version = "/v" + version.substring(0,5); //"/v0.4.2";
+        String url_Version = "/v" + version.substring(0, 5); //"/v0.4.2";
         String url_script = "/ult_actualizacion";
         String url_lenguaje = ".php";
 
@@ -927,7 +929,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         ArrayList listaArray = new ArrayList<>();
 
                         // Solicito los datos al archivo JSON
-                        String msgErrorExcepcion="";
+                        String msgErrorExcepcion = "";
                         try {
                             JSONObject jsonObject = new JSONObject(response);
 
@@ -937,7 +939,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             //Log.i("Json Recibido", jsonObject.toString());
                             if (jsonObject.getString("status").equals("true")) {
                                 activado = jsonObject.getBoolean("activado");
-                                if ( activado == true){
+                                if (activado == true) {
                                     versionApp = jsonObject.getString("version");
 
                                     url_documento = jsonObject.getString("url_documento");
@@ -952,11 +954,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     mensaje = jsonObject.getString("mensaje");
 
                                     actualizacion_permitir = jsonObject.getBoolean("actualizacion_permitir");
+                                    QR_habilitado = jsonObject.getBoolean("QR");
                                     actualizacion_disponible = jsonObject.getBoolean("actualizacion_disponible");
                                     mensaje_actualizacion = jsonObject.getString("actualizacion_mensaje");
                                     url_actualizacion = jsonObject.getString("actualizacion_url");
 
-                                    if ( versionApp.equals("SerOnuba") ){
+                                    if (versionApp.equals("SerOnuba")) {
                                         url_efectivo = jsonObject.getString("url_efectivo");
                                         url_datosDni = jsonObject.getString("url_datosDni");
                                         url_jugador = jsonObject.getString("url_jugador");
@@ -974,7 +977,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 fechaUltActualizacion=objetos.getString("ultActualizacion");
                                 }*/
 
-                            }else{
+                            } else {
                                 Toast.makeText(getApplicationContext(), "Error resultado JSON", Toast.LENGTH_LONG).show();
                             }
 
@@ -984,10 +987,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                             Toast.makeText(getApplicationContext(), "Error procesando JSON", Toast.LENGTH_LONG).show();
 
-                            msgErrorExcepcion=e.toString();
+                            msgErrorExcepcion = e.toString();
                         }
 
-                        if(MainActivity.getDebugMode() == true) {
+                        if (MainActivity.getDebugMode() == true) {
                             //Nuevo SnackBar 28/12/2022
                             Snackbar mySnackbar;
                             if (msgErrorExcepcion.equals("")) {
@@ -1011,19 +1014,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             }
 
                             button_comprobar.setVisibility(View.VISIBLE);
-                            button_scanner.setVisibility(View.VISIBLE);
+                            //button_scanner.setVisibility(View.VISIBLE);
                             button_scanner_nuevo.setVisibility(View.VISIBLE);
 
-                            if (esSalon == false){
+                            if (esSalon == false) {
                                 button_solicitudEfectivo.setVisibility(View.GONE);
                                 button_comprobar.setVisibility(View.GONE);
-                                button_scanner.setVisibility(View.GONE);
+                                //button_scanner.setVisibility(View.GONE);
                                 button_scanner_nuevo.setVisibility(View.GONE);
                             }
 
                             Toast.makeText(getApplicationContext(), fechaUltActualizacion, Toast.LENGTH_LONG).show();
 
-                            if ( MainActivity.getDebugMode() == false && !mensaje.equals("null") ) {
+                            if (MainActivity.getDebugMode() == false && !mensaje.equals("null")) {
                                 Snackbar mySnackbar = Snackbar.make(findViewById(R.id.mainLayout), mensaje, Snackbar.LENGTH_LONG);
                                 //mySnackbar.setAction(R.string.undo_string, new MyUndoListener());
                                 View snackbarView = mySnackbar.getView();
@@ -1073,7 +1076,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             } else { //No hay actualización disponible
                                 if (scanner_inicial == true && activado) {
                                     spinner.setVisibility(View.INVISIBLE);
-                                    startActivity(new Intent(getApplicationContext(), ScannedActivity.class));
+                                    startActivity(new Intent(getApplicationContext(), ScannedBarkoderActivity.class));
                                 }
                             }
 
@@ -1082,7 +1085,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             button_anticipo.setVisibility(View.GONE);
                             button_solicitudEfectivo.setVisibility(View.GONE);
                             button_comprobar.setVisibility(View.INVISIBLE);
-                            button_scanner.setVisibility(View.INVISIBLE);
+                            //button_scanner.setVisibility(View.INVISIBLE);
                             button_scanner_nuevo.setVisibility(View.INVISIBLE);
                             //textUltimaActualizacion.setGravity(Gravity.CENTER);
                             textUltimaActualizacion.setText("Dispositivo NO Activado");
@@ -1095,33 +1098,33 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     public void onErrorResponse(VolleyError error) {
                         error.printStackTrace();
                         Context context = getApplicationContext();
-                        CharSequence textToast="";
-                        CharSequence textError="";
+                        CharSequence textToast = "";
+                        CharSequence textError = "";
 
 
                         if (error instanceof TimeoutError || error instanceof NoConnectionError) {
                             //This indicates that the reuest has either time out or there is no connection
                             textToast = "Servidor no Responde o No Hay Conexión a Internet";
-                            textError="Servidor no Responde o No Hay Conexión a Internet";
+                            textError = "Servidor no Responde o No Hay Conexión a Internet";
 
 
                         } else if (error instanceof AuthFailureError) {
                             // Error indicating that there was an Authentication Failure while performing the request
-                            textToast="Fallo de autenticación del Servidor";
-                            textError="Fallo de autenticación del Servidor";
+                            textToast = "Fallo de autenticación del Servidor";
+                            textError = "Fallo de autenticación del Servidor";
 
                         } else if (error instanceof ServerError) {
                             //Indicates that the server responded with a error response
-                            textToast="Error en la Respuesta del Servidor";
-                            textError="Error en la Respuesta del Servidor";
+                            textToast = "Error en la Respuesta del Servidor";
+                            textError = "Error en la Respuesta del Servidor";
                         } else if (error instanceof NetworkError) {
                             //Indicates that there was network error while performing the request
-                            textToast="Error de Red";
-                            textError="Error de Red";
+                            textToast = "Error de Red";
+                            textError = "Error de Red";
                         } else if (error instanceof ParseError) {
                             // Indicates that the server response could not be parsed
-                            textToast="No se puede interpretar la Respuesta del Servidor";
-                            textError="No se puede interpretar la Respuesta del Servidor";
+                            textToast = "No se puede interpretar la Respuesta del Servidor";
+                            textError = "No se puede interpretar la Respuesta del Servidor";
                         }
 
                         textUltimaActualizacion.setGravity(Gravity.CENTER);
@@ -1154,7 +1157,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ArrayList listaArray = new ArrayList<>();
 
         // Solicito los datos al archivo JSON
-        String msgErrorExcepcion="";
+        String msgErrorExcepcion = "";
         try {
             JSONObject jsonObject = new JSONObject(cadena);
 
@@ -1162,7 +1165,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             // El dato 'status' con el valor 'true' se encuentra dentro del archivo JSON
             if (jsonObject.getString("status").equals("true")) {
                 activado = jsonObject.getBoolean("activado");
-                if ( activado == true){
+                if (activado == true) {
                     versionApp = jsonObject.getString("version");
 
                     url_documento = jsonObject.getString("url_documento");
@@ -1179,7 +1182,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     mensaje_actualizacion = jsonObject.getString("actualizacion_mensaje");
                     url_actualizacion = jsonObject.getString("actualizacion_url");
 
-                    if ( versionApp.equals("SerOnuba") ){
+                    if (versionApp.equals("SerOnuba")) {
                         url_efectivo = jsonObject.getString("url_efectivo");
                         url_jugador = jsonObject.getString("url_jugador");
                     }
@@ -1195,7 +1198,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     fechaUltActualizacion=objetos.getString("ultActualizacion");
                 }*/
 
-            }else{
+            } else {
                 Toast.makeText(getApplicationContext(), "Error resultado JSON", Toast.LENGTH_LONG).show();
             }
 
@@ -1205,10 +1208,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             Toast.makeText(getApplicationContext(), "Error procesando JSON", Toast.LENGTH_LONG).show();
 
-            msgErrorExcepcion=e.toString();
+            msgErrorExcepcion = e.toString();
         }
 
-        if(MainActivity.getDebugMode() == true) {
+        if (MainActivity.getDebugMode() == true) {
             //Nuevo SnackBar 28/12/2022
             Snackbar mySnackbar;
             if (msgErrorExcepcion.equals("")) {
@@ -1271,7 +1274,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     socket.close();
                     Log.i("Thread Impresión", "Thread Impresión finalizado");
                 } catch (final UnknownHostException ex) {
-                    final String resultado="Servidor no Encontrado: " + ex.getMessage();
+                    final String resultado = "Servidor no Encontrado: " + ex.getMessage();
                     Log.e("Thread Impresión", resultado);
 
                     //Nuevo SnackBar 28/12/2022
@@ -1290,7 +1293,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     });
 
                 } catch (final IOException ex) {
-                    final String resultado="I/O error: " + ex.getMessage();
+                    final String resultado = "I/O error: " + ex.getMessage();
                     Log.e("Thread Impresión", resultado);
 
                     //Nuevo SnackBar 28/12/2022
@@ -1320,8 +1323,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     class UpdateApp extends AsyncTask<String, Integer, Boolean> {
         private Context context;
         private Activity activity;
-        private Intent intent;
-        private static final int PERMISSION_REQUEST = 255;
+        private ProgressDialog progressBar;
+        private static final String TAG = "UpdateAPP";
+        private static final String APK_NAME = "update_prohibidos.apk";
 
         public void setContext(Context contextf) {
             context = contextf;
@@ -1334,79 +1338,53 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-
-            progressBar = new ProgressDialog(MainActivity.this);
+            // Nota: Asegúrate de que 'progressBar' esté declarado como variable de clase o en tu MainActivity
+            progressBar = new ProgressDialog(activity); // Se usa activity en vez de MainActivity.this por flexibilidad
             progressBar.setCancelable(false);
             progressBar.setMessage("Descargando Actualización ...");
             progressBar.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
             progressBar.setProgress(0);
             progressBar.setMax(100);
             progressBar.setCanceledOnTouchOutside(false);
-
+            progressBar.show();
         }
 
         @Override
         protected Boolean doInBackground(String... arg0) {
-            String PATH = "/sdcard/Download/";
-            try {
-                if (Build.VERSION.SDK_INT >= 23) {
-                    String[] PERMISSIONS = {android.Manifest.permission.WRITE_EXTERNAL_STORAGE};
-                    if (!hasPermissions(context, PERMISSIONS)) {
-                        ActivityCompat.requestPermissions(activity, PERMISSIONS, PERMISSION_REQUEST);
-                    } else {
-                        //WRITE_EXTERNAL_STORAGE permission granted
-                        checkFile();
-                    }
-                } else {
-                    //WRITE_EXTERNAL_STORAGE permission not required
-                    checkFile();
-                }
+            File outputDir = context.getCacheDir();
+            File outputFile = new File(outputDir, APK_NAME);
 
+            try {
                 URL url = new URL(arg0[0]);
                 HttpURLConnection c = (HttpURLConnection) url.openConnection();
                 c.setRequestMethod("GET");
-                c.setDoOutput(true);
                 c.connect();
 
                 int fileLength = c.getContentLength();
-                if(fileLength <0){
-                    fileLength=41577262;
-                    fileLength=41500000;
+                if (fileLength < 0) {
+                    fileLength = 41500000; // Valor por defecto aproximado
                 }
 
-                //String RutaInterna = getExternalFilesDirs(Environment.DIRECTORY_DOWNLOADS).toString();
-
-                //String PATH = context.getFilesDir() + "/";
-                File file = new File(PATH);
-                file.mkdirs();
-                File outputFile = new File(file, "update_prohibidos.apk");
-                if(file.exists()){
-                    //Toast.makeText(context, "Ruta Existe", Toast.LENGTH_LONG).show();
-                }else{
-                    //Toast.makeText(context, "Ruta NO Existe", Toast.LENGTH_LONG).show();
-                }
                 if (outputFile.exists()) {
                     outputFile.delete();
                 }
-                FileOutputStream fos = new FileOutputStream(outputFile);
 
                 InputStream is = c.getInputStream();
+                FileOutputStream fos = new FileOutputStream(outputFile);
 
                 byte[] buffer = new byte[1024];
-                int len1 = 0;
+                int len1;
                 long total = 0;
+
                 while ((len1 = is.read(buffer)) != -1) {
                     total += len1;
-
-                    //if(fileLength > 0) {
-                        publishProgress((int) (total*100/fileLength));
-                    //}
-
+                    publishProgress((int) (total * 100 / fileLength));
                     fos.write(buffer, 0, len1);
                 }
 
                 fos.close();
                 is.close();
+
                 Handler handler = new Handler(context.getMainLooper());
                 handler.post(new Runnable() {
                     public void run() {
@@ -1414,212 +1392,105 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 });
 
-
-
-
             } catch (final Exception e) {
-                Log.e("UpdateAPP", "Update error! " + e.getMessage());
+                Log.e(TAG, "Download error! " + e.getMessage());
                 Handler handler = new Handler(context.getMainLooper());
                 handler.post(new Runnable() {
                     public void run() {
                         Toast.makeText(context, "Error al Descargar la Actualización:\n" + e.getMessage(), Toast.LENGTH_LONG).show();
                     }
                 });
+                return false;
             }
 
-            try{
-                intent = new Intent(Intent.ACTION_VIEW);
+            // --- PROCESO DE INSTALACIÓN ---
+            try {
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                Uri data = FileProvider.getUriForFile(context, context.getPackageName() + ".provider", outputFile);
 
-                File file = new File(PATH + "update_prohibidos.apk");
-                Uri data = FileProvider.getUriForFile(context, context.getPackageName() + ".provider", file);
                 intent.setDataAndType(data, "application/vnd.android.package-archive");
-                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | FLAG_ACTIVITY_NEW_TASK);
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(intent);
 
-                Log.i("UpdateAPP", "Actualización Completada! ");
-                progressBar.dismiss();
+                Log.i(TAG, "¡Intent de instalación lanzado!");
+
             } catch (final Exception e) {
-                Log.e("UpdateAPP", "Update error! " + e.getMessage());
+                Log.e(TAG, "Installation error! " + e.getMessage());
                 Handler handler = new Handler(context.getMainLooper());
                 handler.post(new Runnable() {
                     public void run() {
-                        Toast.makeText(context, "Error al Actualizar:\n" + e.getMessage(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(context, "Error al abrir el instalador:\n" + e.getMessage(), Toast.LENGTH_LONG).show();
                     }
                 });
+                return false;
             }
             return true;
-
-
-        }
-
-        @Override
-        protected void onPostExecute(final Boolean response) {
-            //this.activity.startActivity( new Intent( this.activity.getBaseContext(), MainActivity.class ) );
-            progressBar.hide();
-            progressBar.dismiss();
         }
 
         @Override
         protected void onProgressUpdate(Integer... values) {
             super.onProgressUpdate(values);
-
-            progressBar.setProgress(values[0]);
-            //progressBar.setMessage(values[0].toString());
-            progressBar.show();
+            if (progressBar != null && progressBar.isShowing()) {
+                progressBar.setProgress(values[0]);
+            }
         }
 
-        private void checkFile() {
-
-            //Path directory of the file we want to load.
-            String PATH = "/sdcard/Download/";
-            File documentsPath = new File(PATH);
-            //If documentsPath doesn´t exists, then create
-            if (!documentsPath.exists()) {
-                Log.i(TAG, "create path: " + documentsPath);
-                documentsPath.mkdir();
-            } else {
-                Log.i(TAG, "path: " + documentsPath + " exists!");
+        @Override
+        protected void onPostExecute(final Boolean success) {
+            super.onPostExecute(success);
+            if (progressBar != null && progressBar.isShowing()) {
+                progressBar.dismiss();
             }
-            File file = new File(documentsPath, "update_prohibidos.apk");
+        }
+
+        // Corregido para comprobar la existencia en el directorio de caché correcto
+        private void checkFile() {
+            File outputDir = context.getCacheDir();
+            File file = new File(outputDir, APK_NAME);
 
             if (file.exists()) {
-                Log.i(TAG, "The file exists!, share file.");
-                //shareFile(file);
+                Log.i(TAG, "El archivo APK existe en caché.");
             } else {
-                Log.e(TAG, "The file doesn´t exists!");
+                Log.e(TAG, "El archivo APK no existe.");
             }
+        }
+    }
 
+    // ==========================================
+// CLASE PARA BORRAR EL APK DE LA CACHÉ
+// ==========================================
+    class borrarUpdate extends AsyncTask<String, String, Boolean> {
+        private Context context;
+        private static final String TAG = "BorrarUpdate";
+        private static final String APK_NAME = "update_prohibidos.apk";
 
+        public void setContext(Context contextf) {
+            context = contextf;
         }
 
-        private boolean hasPermissions(Context context, String... permissions) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && context != null && permissions != null) {
-                for (String permission : permissions) {
-                    if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
-                        return false;
+        // El setActivity ya no es necesario aquí porque no se piden permisos UI
+
+        @Override
+        protected Boolean doInBackground(String... arg0) {
+            try {
+                // Buscamos directamente en la caché de la aplicación
+                File outputDir = context.getCacheDir();
+                File apkFile = new File(outputDir, APK_NAME);
+
+                if (apkFile.exists()) {
+                    if (apkFile.delete()) {
+                        Log.i(TAG, "Update vieja borrada de la caché con éxito.");
+                    } else {
+                        Log.i(TAG, "La Update existía pero no pudo ser borrada.");
                     }
+                } else {
+                    Log.i(TAG, "No hay actualizaciones viejas en caché para borrar.");
                 }
+
+            } catch (Exception e) {
+                Log.e(TAG, "Borrar Update Error! " + e.getMessage());
             }
             return true;
         }
-
-    }
-}
-class borrarUpdate extends AsyncTask<String, String, Boolean> {
-    private Context context;
-    private Activity activity;
-    private Intent intent;
-    private static final int PERMISSION_REQUEST = 255;
-
-    public void setContext(Context contextf){
-        context = contextf;
-    }
-    public void setActivity(Activity activityf){
-        activity = activityf;
-    }
-
-    @Override
-    protected Boolean doInBackground(String... arg0) {
-        try {
-            if (Build.VERSION.SDK_INT >= 23) {
-                String[] PERMISSIONS = {android.Manifest.permission.WRITE_EXTERNAL_STORAGE};
-                if (!hasPermissions(context, PERMISSIONS)) {
-                    ActivityCompat.requestPermissions(activity, PERMISSIONS, PERMISSION_REQUEST );
-                } else {
-                    //WRITE_EXTERNAL_STORAGE permission granted
-                    checkFile();
-                }
-            } else {
-                //WRITE_EXTERNAL_STORAGE permission not required
-                checkFile();
-            }
-
-            String PATH = "/sdcard/Download/update_prohibidos.apk";
-            File documentsPath = new File(PATH);
-            if (documentsPath.exists()) {
-                if(documentsPath.delete()){
-                    Log.i(TAG, "Update Borrada");
-                }else{
-                    Log.i(TAG, "La Update no ha podido ser Borrada");
-                }
-            }else{
-                Log.i(TAG, "No hay Update para borrar");
-            }
-
-            /*
-            String PATH = "/mnt/sdcard/Download/";
-            File file = new File(PATH);
-            file.mkdirs();
-            File outputFile = new File(file, "update.apk");
-            if(outputFile.exists()){
-                outputFile.delete();
-            }
-            FileOutputStream fos = new FileOutputStream(outputFile);
-
-            InputStream is = c.getInputStream();
-
-            byte[] buffer = new byte[1024];
-            int len1 = 0;
-            while ((len1 = is.read(buffer)) != -1) {
-                fos.write(buffer, 0, len1);
-            }
-            fos.close();
-            is.close();
-
-
-            intent = new Intent(Intent.ACTION_VIEW);
-            file = new File("/mnt/sdcard/Download/update.apk");
-            Uri data = FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".provider" , file );
-            intent.setDataAndType(data, "application/vnd.android.package-archive");
-            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | FLAG_ACTIVITY_NEW_TASK);
-            context.startActivity(intent);
-*/
-            Log.i("BorrarUpdate", "Borrar Update Completado! ");
-
-        } catch (Exception e) {
-            Log.e("BorrarUpdate", "Borrar Update Error! " + e.getMessage());
-        }
-        return true;
-
-
-    }
-    @Override
-    protected void onPostExecute( final Boolean response ) {
-
-        //this.activity.startActivity( new Intent( this.activity.getBaseContext(), MainActivity.class ) );
-    }
-
-    private void checkFile(){
-        String PATH = "/sdcard/Download/";
-        //Path directory of the file we want to load.
-        File documentsPath = new File(PATH);
-        //If documentsPath doesn´t exists, then create
-        if (!documentsPath.exists()) {
-            Log.i(TAG, "create path: " + documentsPath);
-            documentsPath.mkdir();
-        }else{
-            Log.i(TAG, "path: " + documentsPath + " exists!");
-        }
-        File file = new File(documentsPath, "update_prohibidos.apk");
-
-        if(file.exists()) {
-            Log.i(TAG, "The file exists!, share file.");
-            //shareFile(file);
-        }else{
-            Log.e(TAG, "The file doesn´t exists!");
-        }
-
-
-    }
-
-    private static boolean hasPermissions(Context context, String... permissions) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && context != null && permissions != null) {
-            for (String permission : permissions) {
-                if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
-                    return false;
-                }
-            }
-        }
-        return true;
     }
 }

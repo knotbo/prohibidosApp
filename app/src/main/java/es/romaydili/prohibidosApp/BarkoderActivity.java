@@ -72,7 +72,8 @@ public class BarkoderActivity extends AppCompatActivity implements BarkoderResul
     }
 
     private void createBarkoderConfig(){
-        bkdView.config = new BarkoderConfig(this, "PEmBIohr9EZXgCkySoetbwP4gvOfMcGzgxKPL2X6uqPgt9Q9z6t7YP8zV_KOTXr3AEEvXNk6TQ-XNUWzZDJHv-TJ52UFEMZmA1n7jpIVcYev1x85Zp0lwKEiKK5twXsYsLdsgIV20QuvPpu7ZVGbyvhRemrXRulnlEw75EVK49kPJ7H1KPhB-4mKa-2SEkPhyYkEUNA1ENmCywYL3cuRdpshohZdgpWnl28LcCrBliUvR5-jkRY3_q45qptFLhkqieeQRyS93RN4d1TxMZ0ZJTEgHTkJs92Sy-sHNUuzLNM.", result -> {
+        //Key Trial: PEmBIohr9EZXgCkySoetbwP4gvOfMcGzgxKPL2X6uqPgt9Q9z6t7YP8zV_KOTXr3AEEvXNk6TQ-XNUWzZDJHv-TJ52UFEMZmA1n7jpIVcYev1x85Zp0lwKEiKK5twXsYsLdsgIV20QuvPpu7ZVGbyvhRemrXRulnlEw75EVK49kPJ7H1KPhB-4mKa-2SEkPhyYkEUNA1ENmCywYL3cuRdpshohZdgpWnl28LcCrBliUvR5-jkRY3_q45qptFLhkqieeQRyS93RN4d1TxMZ0ZJTEgHTkJs92Sy-sHNUuzLNM.
+        bkdView.config = new BarkoderConfig(this, "PEmBIohr9EZXgCkySoetbwP4gvOfMcGzgxKPL2X6uqMtrXD1RXgS_jOox_E1JFNEEJZrbG3l01KFQVzH2Q-JNe954suk20ivG6FTTSYVLGwqpKlO86bRe2DaM8y3CItFXg5uptG410x3izIkE-fLulec8Yqu4nH7gb377IBKA2_u1inGteYLNJRRIO40g_u__Lh6fdVZy61YHBa1AMD9AaIKJHcOIKNlmneMSA6N16L_5fmpodYZNDy-R2b0hIk_", result -> {
             Log.i("LicenseInfo", result.message); // [cite: 97]
             //return null;
         });
@@ -213,6 +214,7 @@ public class BarkoderActivity extends AppCompatActivity implements BarkoderResul
                 scanResult.put("text", res.textualData);
                 scanResult.put("type", res.barcodeTypeName);
                 scanResult.put("characterSet", res.characterSet);
+                //scanResult.put("versionSDK", Barkoder.GetVersion());
 
                 // Incluso puedes meter los "extras" (Nombre, apellidos, etc. si es un DNI)
                 if (results[0].extra != null) {

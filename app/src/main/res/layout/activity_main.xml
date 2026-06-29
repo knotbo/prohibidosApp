@@ -152,24 +152,6 @@
                 android:visibility="invisible" />
 
             <Button
-                android:id="@+id/btn_scanner"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/framelatout_1"
-                android:layout_marginLeft="15dp"
-                android:layout_marginTop="5dp"
-                android:layout_marginRight="15dp"
-                android:layout_marginBottom="10dp"
-                android:background="@drawable/buttons"
-                android:drawableLeft="@drawable/ic_twotone_camera_alt_24"
-                android:padding="17dp"
-                android:text="Leer Documento (ANTIGUO)"
-                android:textAllCaps="true"
-                android:textColor="@android:color/white"
-                android:textSize="18sp"
-                android:visibility="invisible" />
-
-            <Button
                 android:id="@+id/btn_scanner_nuevo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -178,38 +160,57 @@
                 android:layout_marginTop="5dp"
                 android:layout_marginRight="15dp"
                 android:layout_marginBottom="10dp"
-                android:background="@drawable/buttons3"
+                android:background="@drawable/buttons4"
                 android:drawableLeft="@drawable/ic_twotone_qr_alt_24"
                 android:padding="17dp"
-                android:text="Leer Documento (Beta)"
+                android:text="Leer Documento (Nuevo)"
                 android:textAllCaps="true"
                 android:textColor="@android:color/white"
                 android:textSize="18sp"
                 android:visibility="invisible" />
+            <!--
+           <Button
+               android:id="@+id/btn_scanner"
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:layout_below="@+id/framelatout_1"
+               android:layout_marginLeft="15dp"
+               android:layout_marginTop="5dp"
+               android:layout_marginRight="15dp"
+               android:layout_marginBottom="10dp"
+               android:background="@drawable/buttons"
+               android:drawableLeft="@drawable/ic_twotone_camera_alt_24"
+               android:padding="17dp"
+               android:text="Leer Documento (ANTIGUO)"
+               android:textAllCaps="true"
+               android:textColor="@android:color/white"
+               android:textSize="18sp"
+               android:visibility="invisible" />
+             -->
 
-            <Button
-                android:id="@+id/btn_configuracion"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/btn_comprobar"
-                android:layout_marginLeft="15dp"
-                android:layout_marginTop="5dp"
-                android:layout_marginRight="15dp"
-                android:layout_marginBottom="10dp"
-                android:background="@drawable/buttons"
-                android:drawableLeft="@drawable/ic_twotone_settings_24"
-                android:padding="17dp"
-                android:text="Configuración"
-                android:textAllCaps="true"
-                android:textColor="@android:color/white"
-                android:textSize="18sp"
-                android:visibility="visible" />
+           <Button
+               android:id="@+id/btn_configuracion"
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:layout_below="@+id/btn_comprobar"
+               android:layout_marginLeft="15dp"
+               android:layout_marginTop="5dp"
+               android:layout_marginRight="15dp"
+               android:layout_marginBottom="10dp"
+               android:background="@drawable/buttons"
+               android:drawableLeft="@drawable/ic_twotone_settings_24"
+               android:padding="17dp"
+               android:text="Configuración"
+               android:textAllCaps="true"
+               android:textColor="@android:color/white"
+               android:textSize="18sp"
+               android:visibility="visible" />
 
 
-        </LinearLayout>
+       </LinearLayout>
 
 
-    </FrameLayout>
+   </FrameLayout>
 
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

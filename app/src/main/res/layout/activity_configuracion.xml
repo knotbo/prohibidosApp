@@ -117,7 +117,7 @@
                     android:background="@color/colorPrimaryDark"
                     android:gravity="center"
                     android:textSize="18sp" />
-
+                <!--
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -133,7 +133,7 @@
                     android:background="@color/colorPrimaryDark"
                     android:gravity="center"
                     android:textSize="18sp" />
-
+                -->
                 <TextView
                     android:id="@+id/provincia_txt"
                     android:layout_width="wrap_content"
@@ -144,6 +144,23 @@
 
                 <TextView
                     android:id="@+id/provincia"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginBottom="20dp"
+                    android:background="@color/colorPrimaryDark"
+                    android:gravity="center"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/qr_txt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="QR MIDNI"
+                    android:textAllCaps="true"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/qr_estado"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
                     android:layout_marginBottom="20dp"
