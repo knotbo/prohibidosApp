@@ -42,7 +42,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.material.snackbar.Snackbar;
-import com.scansolutions.mrzscannerlib.MRZScanner;
+//import com.scansolutions.mrzscannerlib.MRZScanner;
 
 import org.json.JSONException;
 import org.json.JSONObject;

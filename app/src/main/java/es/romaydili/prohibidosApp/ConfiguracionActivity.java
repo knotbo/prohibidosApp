@@ -33,7 +33,7 @@ import android.widget.Toast;
 import com.barkoder.Barkoder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
-import com.scansolutions.mrzscannerlib.MRZScanner;
+//import com.scansolutions.mrzscannerlib.MRZScanner;
 import com.squareup.timessquare.CalendarPickerView;
 import java.util.ArrayList;
 import java.util.Calendar;

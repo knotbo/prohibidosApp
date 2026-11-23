@@ -468,7 +468,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         if (view == button_solicitudEfectivo) {
             spinner.setVisibility(View.INVISIBLE);
-            startActivity(new Intent(getApplicationContext(), ScannedSolicitudEfectivoActivity.class));
+            startActivity(new Intent(getApplicationContext(), ScannedBarkoderSolicitudEfectivoActivity.class));
         }
 
         if (view == button_comprobar) {

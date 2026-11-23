@@ -124,11 +124,11 @@ public class BarkoderActivity extends AppCompatActivity implements BarkoderResul
         if (isFlashActive) {
             bkdView.setFlashEnabled(false);
             isFlashActive = false;
-            buttonFlash.setImageResource(R.drawable.amrz_ic_ico_flash_off);
+            buttonFlash.setImageResource(R.drawable.outline_flash_off_24);
         }else{
             bkdView.setFlashEnabled(true);
             isFlashActive = true;
-            buttonFlash.setImageResource(R.drawable.amrz_ic_flash_on);
+            buttonFlash.setImageResource(R.drawable.outline_flash_on_24);
         }
     }
 

@@ -1,44 +1,27 @@
 package es.romaydili.prohibidosApp;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-
-import androidx.appcompat.app.AppCompatActivity;
+import static android.content.ContentValues.TAG;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.os.CancellationSignal;
-//import android.os.Handler;
-//import android.os.Looper;
-import android.os.ParcelFileDescriptor;
-import android.print.PageRange;
-//import android.print.PrintManager;
 import android.text.Editable;
-import android.text.Html;
 import android.text.InputFilter;
-import android.text.InputType;
 import android.text.Spanned;
 import android.text.TextWatcher;
-import android.text.method.LinkMovementMethod;
-import android.view.Gravity;
-import android.view.LayoutInflater;
+import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
-//import android.webkit.WebView;
-//import android.webkit.WebViewClient;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkError;
@@ -53,7 +36,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.material.snackbar.Snackbar;
-import com.scansolutions.mrzscannerlib.MRZScanner;
+//import com.scansolutions.mrzscannerlib.MRZScanner;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -70,14 +53,11 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import android.print.PrintDocumentAdapter;
-import android.print.PrintAttributes;
 
 //import javax.crypto.Cipher;
 
 
-
-public class ScannedSolicitudEfectivoActivity extends AppCompatActivity implements View.OnClickListener {
+public class ScannedBarkoderSolicitudEfectivoActivity extends AppCompatActivity implements View.OnClickListener {
     private RequestQueue requestQueue;
     public static final int REQUEST_CODE = 1;
     public final String resultado ="";
@@ -89,6 +69,8 @@ public class ScannedSolicitudEfectivoActivity extends AppCompatActivity implemen
     EditText editNombre, editApellidos, editDocNum, editOtroBanco, editImporte;
     TextView datosCliente, txtOtroBanco, txtUltSolicitudEfectivo;
     Spinner spinnerBanco,  spinnerUltSolicitudes;
+
+    JSONObject JsonFinalUnificado = null;
 
 
 
@@ -258,14 +240,11 @@ public class ScannedSolicitudEfectivoActivity extends AppCompatActivity implemen
 
     private void addResultToEditText(JSONObject successfulMrzScan) throws JSONException {
 
-        editNombre.setText(successfulMrzScan.getString("given_names_readable"));
-        editApellidos.setText(successfulMrzScan.getString("surname"));
-        editDocNum.setText(successfulMrzScan.getString("document_number"));
+        editNombre.setText(successfulMrzScan.getString("nombre"));
+        editApellidos.setText(successfulMrzScan.getString("apellidos"));
+        editDocNum.setText(successfulMrzScan.getString("dni"));
 
         //Submit();
-
-
-
     }
 
 
@@ -283,7 +262,7 @@ public class ScannedSolicitudEfectivoActivity extends AppCompatActivity implemen
         }
     }
 
-    @Override
+    /*@Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         try {
             super.onActivityResult(requestCode, resultCode, data);
@@ -297,6 +276,109 @@ public class ScannedSolicitudEfectivoActivity extends AppCompatActivity implemen
             }
         } catch (Exception ex) {
             Toast.makeText(this, "Fallo en el resultado de la actividad\r\n" + MRZScanner.sdkVersion(), Toast.LENGTH_SHORT).show();
+        }
+    }*/
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 1 && resultCode == RESULT_OK && data != null) {
+            try {
+                JSONObject jsonObj = new JSONObject(data.getStringExtra("key"));
+                String tipo = jsonObj.optString("type", "");
+
+                if (tipo.equals("QR")) {
+                    procesarLecturaQR();
+                } else {
+                    procesarLecturaMRZ(jsonObj);
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Error en onActivityResult: " + e.getMessage());
+            }
+        }else{
+            getUltimasSolicitudes();
+        }
+    }
+
+    private void procesarLecturaQR() {
+        new Thread(() -> {
+            try {
+                Log.i(TAG, "Procesando QR...");
+
+                // 1. RECUPERAMOS los bytes del "túnel" (Holder)
+                byte[] rawBytes = ScanDataHolder.rawBarcodeData;
+
+                // 2. LIMPIAMOS EL HOLDER YA
+                ScanDataHolder.rawBarcodeData = null;
+
+                if (rawBytes != null) {
+                    // 3. PARSEAMOS el binario puro para obtener los campos del DNI
+                    // Esta es la función que creamos para entender el formato ASN.1/DER
+                    JSONObject result = MiDniParser.parsear(rawBytes);
+
+                    Log.d(TAG, "Resultado de Parsear MiDni: " + result);
+
+                    // 4. ADAPTAMOS al formato estándar que entiende tu UI
+                    //JSONObject jsonUnificado = new JSONObject();
+                    JsonFinalUnificado = new JSONObject();
+
+                    // Mapeamos lo que sale del Parser a los nombres de tu "contrato unificado"
+                    JsonFinalUnificado.put("nombre", result.optString("first_name", ""));
+                    JsonFinalUnificado.put("apellidos", result.optString("last_name", ""));
+                    JsonFinalUnificado.put("dni", result.optString("document_number", ""));
+
+                    // 4. VOLCAMOS a la UI en el hilo principal
+                    runOnUiThread(() -> {
+                        try {
+                            // Log para verificar qué estamos enviando a la pantalla
+                            Log.i(TAG, "Enviando datos unificados a la UI: " + JsonFinalUnificado.toString());
+
+                            addResultToEditText(JsonFinalUnificado);
+
+                        } catch (JSONException e) {
+                            // Este catch es vital para que compile y para capturar errores de formato de último minuto
+                            Log.e(TAG, "Error de JSON al volcar a la UI: " + e.getMessage());
+                            Toast.makeText(this, "Error visualizando los datos", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                } else {
+                    Log.e(TAG, "Error: ScanDataHolder.rawBarcodeData es nulo");
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Fallo crítico procesando QR: " + e.getMessage());
+                runOnUiThread(() ->
+                        Toast.makeText(this, "Error al procesar el código QR", Toast.LENGTH_LONG).show()
+                );
+            }
+        }).start();
+    }
+
+    private void procesarLecturaMRZ(JSONObject mrzRaw) {
+        Log.i(TAG, "Procesando MRZ: " + mrzRaw);
+        try {
+            JSONObject details = mrzRaw.getJSONObject("details");
+            JSONObject inner = new JSONObject(details.getString("JSON"));
+            JSONObject normal = inner.getJSONObject("normal");
+            JSONObject formatted = inner.getJSONObject("formatted");
+
+            //JSONObject jsonUnificado = new JSONObject();
+            JsonFinalUnificado = new JSONObject();
+            JsonFinalUnificado.put("nombre", normal.optString("first_name", ""));
+            JsonFinalUnificado.put("apellidos", normal.optString("last_name", ""));
+
+            // Lógica de Swap DNI/Soporte que ya tenías
+            String nroDoc = normal.optString("document_number", "");
+            String optData = normal.optString("optional_data", "");
+            if (!optData.isEmpty()) {
+                JsonFinalUnificado.put("dni", optData); // El DNI real suele ir aquí en MRZ
+            } else {
+                JsonFinalUnificado.put("dni", nroDoc);
+            }
+
+            addResultToEditText(JsonFinalUnificado);
+        } catch (Exception e) {
+            Log.e(TAG, "Error procesando MRZ: " + e.getMessage());
         }
     }
 
@@ -333,7 +415,7 @@ public class ScannedSolicitudEfectivoActivity extends AppCompatActivity implemen
 
 
     private void startScanner() {
-        startActivityForResult(new Intent(getApplicationContext(),ScannerActivity.class),REQUEST_CODE);
+        startActivityForResult(new Intent(getApplicationContext(),BarkoderActivity.class),REQUEST_CODE);
     }
 
     private void getUltimasSolicitudes(){
@@ -372,7 +454,7 @@ public class ScannedSolicitudEfectivoActivity extends AppCompatActivity implemen
                                     lista_ultimasSolicitudes.add(object1.getString( "dni") +  ", " + object1.getString("apellidos") + ", " + object1.getString("nombre"));
                                     //textView.setText(object1.toString());
                                 }
-                                ArrayAdapter<String> adapter2 = new ArrayAdapter<>(ScannedSolicitudEfectivoActivity.this, R.layout.support_simple_spinner_dropdown_item, lista_ultimasSolicitudes);
+                                ArrayAdapter<String> adapter2 = new ArrayAdapter<>(ScannedBarkoderSolicitudEfectivoActivity.this, R.layout.support_simple_spinner_dropdown_item, lista_ultimasSolicitudes);
                                 spinnerUltSolicitudes.setAdapter(adapter2);
                             }else{
                                 if(jsonObject.getString("status").equals("true")) {

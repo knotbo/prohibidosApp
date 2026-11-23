@@ -27,19 +27,16 @@
             android:configChanges="orientation"
             android:screenOrientation="portrait"
             />
+        <activity android:name="es.romaydili.prohibidosApp.ScannedBarkoderSolicitudEfectivoActivity"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"
+            />
         <activity android:name="es.romaydili.prohibidosApp.ConfiguracionActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait"
             />
+        <!-- Actividades MRZScanner
         <activity android:name="es.romaydili.prohibidosApp.ScannerActivity"
-            android:configChanges="orientation"
-            android:screenOrientation="portrait"
-            />
-        <activity android:name="es.romaydili.prohibidosApp.anticipoActivity"
-            android:configChanges="orientation"
-            android:screenOrientation="portrait"
-            />
-        <activity android:name="es.romaydili.prohibidosApp.ScannedSolicitudEfectivoActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait"
             />
@@ -47,6 +44,16 @@
             android:configChanges="orientation"
             android:screenOrientation="portrait"
             />
+         <activity android:name="es.romaydili.prohibidosApp.ScannedSolicitudEfectivoActivity"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"
+            />
+         -->
+        <activity android:name="es.romaydili.prohibidosApp.anticipoActivity"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"
+            />
+
         <activity android:name="es.romaydili.prohibidosApp.MainActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait"

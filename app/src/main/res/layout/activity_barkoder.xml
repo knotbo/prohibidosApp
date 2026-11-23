@@ -101,7 +101,7 @@
         android:layout_margin="20dp"
         app:layout_constraintBottom_toTopOf="@id/thumbNailMRZPicture"
         app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@drawable/amrz_ic_ico_flash_off"
+        app:srcCompat="@drawable/outline_flash_off_24"
         />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton

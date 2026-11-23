@@ -190,12 +190,12 @@ public class anticipoActivity extends AppCompatActivity implements View.OnClickL
 
 
     private void checkForm(){
-        if (editNombreSolicitante.getText().length() > 3
-            && editApellidosSolicitante.getText().length() > 3
-            && editDniSolicitante.getText().length() > 3
-            && editNombreEncargado.getText().length() > 3
-            && editApellidosEncargado.getText().length() > 3
-            && editDniEncargado.getText().length() > 3
+        if (editNombreSolicitante.getText().length() >= 3
+            && editApellidosSolicitante.getText().length() >= 3
+            && editDniSolicitante.getText().length() >= 3
+            && editNombreEncargado.getText().length() >= 3
+            && editApellidosEncargado.getText().length() >= 3
+            && editDniEncargado.getText().length() >= 3
             && importe >= 100
             && importe <= 300
             && !editDniSolicitante.getText().toString().equals(editDniEncargado.getText().toString())
